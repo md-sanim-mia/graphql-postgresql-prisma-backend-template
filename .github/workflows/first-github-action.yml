@@ -1,0 +1,23 @@
+name: backend template
+
+on:
+  push:
+
+jobs:
+  my-first-job:
+    runs-on: windows-latest  # Windows environment
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
