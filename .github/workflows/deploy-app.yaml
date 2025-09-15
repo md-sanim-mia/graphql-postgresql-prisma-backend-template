@@ -163,7 +163,7 @@ jobs:
       - name: Build code server
         run: npm run build
 
-  deploy-vercel:
+    deploy-vercel:
     runs-on: ubuntu-latest
     needs: build-code-server
     steps:
