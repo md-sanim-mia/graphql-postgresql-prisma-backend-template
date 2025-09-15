@@ -163,7 +163,7 @@ jobs:
       - name: Build code server
         run: npm run build
 
-  deploy-vercel:   # 👈 এটা jobs এর নিচে রাখলাম
+  deploy-vercel:
     runs-on: ubuntu-latest
     needs: build-code-server
     steps:
@@ -175,7 +175,8 @@ jobs:
 
       - name: Deploy to Vercel
         run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+
       - name: Debug token
-         run: echo "Token length is: ${#VERCEL_TOKEN}"
+        run: echo "Token length is: ${#VERCEL_TOKEN}"
         env:
-        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
