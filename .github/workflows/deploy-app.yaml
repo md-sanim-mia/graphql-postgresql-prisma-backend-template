@@ -1,7 +1,4 @@
-on:
-  push:
-    branches:
-      - main
+on: [push, pull_request, workflow_dispatch, release]
 
 jobs:
   build-and-deploy:
@@ -47,3 +44,30 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        name:configure ssh
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }} # Add your private key to the repository secrets
+      - name: Add server to known hosts 
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts # Add your server's IP address or hostname to known hosts
+      - name: Deploy to server  
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd /path/to/your/app || exit  # Change to your app directory
+            git pull origin main  # Pull the latest changes from your repository
+            npm install  # Install dependencies
+            npm run build  # Build the application
+            pm2 restart all  # Restart the application using PM2
+          EOF # End of SSH command      
+      - name: Notify deployment success
+        run: echo "Deployment to server completed successfully!"
+      - name: Notify deployment failure
+        if: failure()
+        run: echo "Deployment to server failed!"
+      - name: Clean up
+        run: rm -rf ~/.ssh/known_hosts
+      - name: End of workflow
+        run: echo "Workflow completed."
